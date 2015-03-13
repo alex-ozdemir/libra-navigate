@@ -13,6 +13,8 @@ from irobot_mudd.srv import *
 from irobot_mudd.msg import *
 from math import *
 from laser import HALLWAY_WIDTH_IN_MM
+from nav_constants import *
+import libra_map
 
 
 # class for a generic data holder
@@ -34,17 +36,7 @@ D.last_time_printed = 0    # we'll print once in a while
 D.last_time_clocked = D.start_time # the last time we hit the stopwatch
 D.intersection_data = [False, True, True, False]
 
-# Intersections
-BACK_T = [True, False, False, False]
-RIGHT_T = [False, False, True, False]
-HALL = [False, True, True, False]
-RIGHT = [True, False, True, False]
-LEFT = [True, True, False, False]
 
-# COmands
-TURN_LEFT = 1
-TURN_RIGHT = -1
-TURN_AROUND = 2
 
 TURN_SPEED = BASE_SPEED / 2
 TURN_TIME_360 = 8.30 * 100 / TURN_SPEED
@@ -63,15 +55,19 @@ D.STATE = "WAITING_TO_START"
 
 D.NAV_STATE = 0
 
-D.NAV_DATA = [
-    [BACK_T, TURN_LEFT, 8.0],
-    [LEFT, TURN_LEFT, 8.0],
-    [RIGHT_T, TURN_RIGHT, 7.0],
-    [LEFT, TURN_AROUND, 7.0],
-    [BACK_T, TURN_LEFT, 8.0],
-    [RIGHT, TURN_RIGHT, 8.0],
-    [RIGHT_T, TURN_RIGHT, 7.0]
-]
+D.libra = libra_map.make_libra_small()
+
+D.NAV_DATA = D.libra.get_directions('A', 'B', 'E')
+
+# D.NAV_DATA = [
+#     [BACK_T, TURN_LEFT, 8.0],
+#     [LEFT, TURN_LEFT, 8.0],
+#     [RIGHT_T, TURN_RIGHT, 7.0],
+#     [LEFT, TURN_AROUND, 7.0],
+#     [BACK_T, TURN_LEFT, 8.0],
+#     [RIGHT, TURN_RIGHT, 8.0],
+#     [RIGHT_T, TURN_RIGHT, 7.0]
+# ]
 
 
 
