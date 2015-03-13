@@ -222,9 +222,9 @@ def findHoughLines():
     # Here are the  options for the Hough transformation
     distance_res = 20 # old value 3  # distance resolution of Hough accumulator, in pixels
     angle_res    = radians(10)  # angular resolution of Hough acc., in radians
-    min_votes    = 60#20 # how many votes needed to count a line?
+    min_votes    = 40#20 # how many votes needed to count a line?
     min_line_len = 0.05 * MAG_SCALE # shortest allowable line, in pixels
-    max_gap_len  = 50 # pixels
+    max_gap_len  = 30 # pixels
     
     # The return value is a list of line segments
     Lines = cv.HoughLines2(D.hough,
