@@ -43,7 +43,7 @@ TURN_TIME_360 = 8.30 * 100 / TURN_SPEED
 STRAIGHT_TIME = 8
 ONE_FOOT_TIME = 1.3 / (BASE_SPEED / 200.)
 def ENTER_INTERSECTION_TIME():
-    return int(ONE_FOOT_TIME * D.NAV_DATA[D.NAV_STATE][2] / 2.)
+    return int(ONE_FOOT_TIME * getInstructions()[2] / 2.)
 
 D.STATE = "WAITING_TO_START"
 # States!
@@ -58,18 +58,14 @@ D.NAV_STATE = 0
 D.libra = libra_map.make_libra_small()
 
 D.NAV_DATA = D.libra.get_directions('A', 'B', 'E')
+print "Instructions:"
+print D.NAV_DATA
 
-# D.NAV_DATA = [
-#     [BACK_T, TURN_LEFT, 8.0],
-#     [LEFT, TURN_LEFT, 8.0],
-#     [RIGHT_T, TURN_RIGHT, 7.0],
-#     [LEFT, TURN_AROUND, 7.0],
-#     [BACK_T, TURN_LEFT, 8.0],
-#     [RIGHT, TURN_RIGHT, 8.0],
-#     [RIGHT_T, TURN_RIGHT, 7.0]
-# ]
-
-
+def getInstructions():
+    if D.NAV_STATE < len( D.NAV_DATA ):
+        return D.NAV_DATA[D.NAV_STATE]
+    else:
+        return False
 
 
 last_hall = None
@@ -86,9 +82,13 @@ def laser_data_callback(data):
         last_hall = D.intersection_data
 
     if D.STATE == "HALLWAY":
-        if D.intersection_data == D.NAV_DATA[D.NAV_STATE][0]:
-            print "Expected Intersection detected!", D.intersection_data
-            enter_state("ENTER_INTERSECTION")
+        expected_intersection = getInstructions()[0]
+        if expected_intersection:
+            if D.intersection_data == expected_intersection:
+                print "Expected Intersection detected!", D.intersection_data
+                enter_state("ENTER_INTERSECTION")
+        else:
+            enter_state("WAITING_TO_START")
 
     elif D.STATE == "ENTER_INTERSECTION":
         front_distance = D.list_laser_data[5]
@@ -226,7 +226,7 @@ def main():
                 enter_state("HANDLE_INTERSECTION")
 
         elif D.STATE == "HANDLE_INTERSECTION":
-            if current_time >  do_turn(D.NAV_DATA[D.NAV_STATE][1]) + D.last_time_clocked:
+            if current_time >  do_turn(getInstructions()[1]) + D.last_time_clocked:
                 enter_state("LEAVE_INTERSECTION")
 
         elif D.STATE == "LEAVE_INTERSECTION":
@@ -237,7 +237,7 @@ def main():
                 D.NAV_STATE += 1
 
         elif D.STATE == "WAITING_TO_START":
-            pass # do nothing
+            D.robot_publisher.publish( "D.tank(0,0)" )
 
         else:
             print "I don't recognize the state", D.STATE
