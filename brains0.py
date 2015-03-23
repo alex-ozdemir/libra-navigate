@@ -134,6 +134,7 @@ def robot_sensor_callback( data ):
         #D.robot_publisher.publish( "song()" ) # Yay, Python!
         # Start your state machine here, perhaps!
         D.STATE = "HALLWAY"
+        D.NAV_STATE = 0
 
     if data.bumpRight or data.bumpLeft == True:
         #print "My Bumpers!"
@@ -233,7 +234,7 @@ def main():
             #TODO: May be unstable
             follow_wall()
             if current_time > STRAIGHT_TIME + D.last_time_clocked:
-                D.STATE = "HALLWAY"
+                enter_state("HALLWAY")
                 D.NAV_STATE += 1
 
         elif D.STATE == "WAITING_TO_START":
