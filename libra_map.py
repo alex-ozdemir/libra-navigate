@@ -85,6 +85,8 @@ class LibraMap(object):
         return False
 
     def get_directions(self, start1, start2, dest):
+        if type(dest) == type([]):
+            return self._get_directions_list(start1, start2, dest)
         # TODO: check if the start is valid
         path = self.find_bare_path(start2, dest)
         direction = self.get_dir_and_width(start1, start2)[0]
@@ -99,24 +101,16 @@ class LibraMap(object):
             direction = dir_
         return instructions
 
-# Wrong format
-# def test_3_complete():
-#     global inter, halls, lmap
-#     inter = ['A', 'B', 'C']
-#     halls = [('A', 'B', 3), ('C', 'B', 3), ('A', 'C', 3)]
-#     lmap = LibraMap(inter, halls)
-
-# def test_6_chain():
-#     global inter, halls, lmap
-#     inter = ['A', 'B', 'C', 'D', 'E', 'F']
-#     halls = [('A', 'B', 3), ('C', 'B', 3), ('D', 'C', 3), ('D', 'E', 3), ('F', 'E', 3)]
-#     lmap = LibraMap(inter, halls)
-
-# def test_6_loop():
-#     global inter, halls, lmap
-#     inter = ['A', 'B', 'C', 'D', 'E', 'F']
-#     halls = [('A', 'B', 3), ('C', 'B', 3), ('C', 'A', 3), ('D', 'C', 3), ('D', 'E', 3), ('F', 'D', 3)]
-#     lmap = LibraMap(inter, halls)
+    def _get_directions_list(self, start1, start2, dest):
+        if len(dest) == 1:
+            return self.get_directions(start1, start2, dest[0])
+        else:
+            first_dst = dest[0]
+            path = self.find_bare_path(start2, dest[0])
+            to_first = self.get_directions(start1, start2, dest[0])
+            second_last = path[-2]
+            assert first_dst != second_last
+            return to_first + self._get_directions_list(second_last, first_dst, dest[1:])
 
 def make_libra_small():
     inter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
@@ -146,6 +140,9 @@ def test_libra_small():
     s1, s2, e = 'A', 'B', 'K'
     res = libra.get_directions(s1, s2, e)
     print ('%s%s -> %s:   ' % (s1, s2, e) ), res 
+    s1, s2, e, e2, e3 = 'A', 'B', 'K', 'F', 'B'
+    res = libra.get_directions(s1, s2, [e, e2, e3])
+    print ('%s%s -> %s -> %s -> %s:   ' % (s1, s2, e, e2, e3) ), res 
 
 if __name__ == '__main__':
     test_libra_small()

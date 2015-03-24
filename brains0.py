@@ -57,7 +57,7 @@ D.NAV_STATE = 0
 
 D.libra = libra_map.make_libra_small()
 
-D.NAV_DATA = D.libra.get_directions('A', 'B', 'E')
+D.NAV_DATA = D.libra.get_directions('A', 'B', ['D','B','D'])
 print "Instructions:"
 print D.NAV_DATA
 
@@ -82,9 +82,10 @@ def laser_data_callback(data):
         last_hall = D.intersection_data
 
     if D.STATE == "HALLWAY":
-        expected_intersection = getInstructions()[0]
-        if expected_intersection:
-            if D.intersection_data == expected_intersection:
+        next_instruction = getInstructions()
+        if next_instruction:
+            next_intersection = next_instruction[0]
+            if D.intersection_data == next_intersection:
                 print "Expected Intersection detected!", D.intersection_data
                 enter_state("ENTER_INTERSECTION")
         else:
